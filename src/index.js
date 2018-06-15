@@ -1,8 +1,11 @@
+define(function(localRequire, exports, module) { var requireOrig = require; require = localRequire;
 "use strict";
+
+var assign = require("lodash/assign");
 
 // Map the characters to escape to their escaped values. The list is derived
 // from http://www.cespedes.org/blog/85/how-to-escape-latex-special-characters
-const defaultEscapes = {
+var defaultEscapes = {
   "{": "\\{",
   "}": "\\}",
   "\\": "\\textbackslash{}",
@@ -14,7 +17,7 @@ const defaultEscapes = {
   _: "\\_",
   "~": "\\textasciitilde{}",
 };
-const formatEscapes = {
+var formatEscapes = {
   "–": "\\--",
   "—": "\\---",
   " ": "~",
@@ -23,8 +26,9 @@ const formatEscapes = {
   "\n": "\\\\newline{}",
 };
 
-const defaultEscapeMapFn = (defaultEscapes, formatEscapes) =>
-  Object.assign({}, defaultEscapes, formatEscapes);
+var defaultEscapeMapFn = function(defaultEscapes, formatEscapes) {
+  return assign({}, defaultEscapes, formatEscapes);
+};
 
 /**
  * Escape a string to be used in LaTeX documents.
@@ -36,22 +40,26 @@ const defaultEscapeMapFn = (defaultEscapes, formatEscapes) =>
  */
 module.exports = function(
   str,
-  { preserveFormatting = false, escapeMapFn = defaultEscapeMapFn } = {},
+  params
 ) {
-  let runningStr = String(str);
-  let result = "";
+//  { preserveFormatting = false, escapeMapFn = defaultEscapeMapFn } = {},
+  var pars = params || {};
+  var preserveFormatting = pars.preserveFormatting || false;
+  var escapeMapFn = pars.escapeMapFn || defaultEscapeMapFn;
+  var runningStr = String(str);
+  var result = "";
 
-  const escapes = escapeMapFn(
-    Object.assign({}, defaultEscapes),
-    preserveFormatting ? Object.assign({}, formatEscapes) : {},
+  var escapes = escapeMapFn(
+    assign({}, defaultEscapes),
+    preserveFormatting ? assign({}, formatEscapes) : {}
   );
-  const escapeKeys = Object.keys(escapes); // as it is reused later on
+  var escapeKeys = Object.keys(escapes); // as it is reused later on
 
   // Algorithm: Go through the string character by character, if it matches
   // with one of the special characters then we'll replace it with the escaped
   // version.
   while (runningStr) {
-    let specialCharFound = false;
+    var specialCharFound = false;
     escapeKeys.forEach(function(key, index) {
       if (specialCharFound) {
         return;
@@ -72,3 +80,5 @@ module.exports = function(
   }
   return result;
 };
+
+require = requireOrig;});

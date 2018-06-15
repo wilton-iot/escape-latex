@@ -51,5 +51,10 @@
     "prettier": "^1.9.2"
   },
   "author": "Dang Mai",
-  "license": "MIT"
+  "license": "MIT",
+  "wilton": {
+    "excludes": [
+      "src/index.test.js"
+    ]
+  }
 }
